@@ -1,12 +1,12 @@
-int width = 600;
-int height = 400;
-
-int cols;
-int rows;
-
 int resolution = 10;
+static final int[][] neighbors = {
+    {-1, -1}, {-1, 0}, {-1, +1},
+    { 0, -1},          { 0, +1},
+    {+1, -1}, {+1, 0}, {+1, +1}};
 
 Cell[][] board;
+int cols;
+int rows;
 
 Cell[][] createBoard(int rows, int cols) {
   Cell [][] board = new Cell[rows][cols];
@@ -50,31 +50,25 @@ void draw() {
 void gameLogic() {
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
-      int neighbors = getLiveNeighbors(i, j);
-      if (board[i][j].isAlive() && (neighbors == 2 || neighbors == 3)) { print("setting alive"); board[i][j].setNextAlive(true); }
+      int neighbors = getNeighbors(i, j);
+      if (board[i][j].isAlive() && (neighbors == 2 || neighbors == 3)) { board[i][j].setNextAlive(true); }
       else if (!board[i][j].isAlive() && neighbors == 3) { board[i][j].setNextAlive(true); }
       else { board[i][j].setNextAlive(false); }
     }
   }
 }
 
-int getLiveNeighbors(int row, int col) {
+int getNeighbors(int row, int col) {
   int count = 0;
-  if (row != 0 && row != rows - 1) {
-    if (col != 0 && col != cols - 1) {
-      if (board[row - 1][col - 1].isAlive()) { count++; }
-      if (board[row - 1][col].isAlive()) { count++; }
-      if (board[row - 1][col + 1].isAlive()) { count++; }
-      
-      if (board[row][col - 1].isAlive()) { count++; }
-      if (board[row][col + 1].isAlive()) { count++; }
-      
-      if (board[row + 1][col - 1].isAlive()) { count++; }
-      if (board[row + 1][col].isAlive()) { count++; }
-      if (board[row + 1][col + 1].isAlive()) { count++; }
-    }
+  for (int[] offset : neighbors) {
+    if (hasNeighborAt(row + offset[0], col + offset[1])) { count++; }
   }
   return count;
+}
+
+boolean hasNeighborAt(int row, int col) {
+  if (col < 0 || row < 0 || col >= cols || row >= rows) { return false; }
+  return board[row][col].isAlive();
 }
 
 public class Cell {
