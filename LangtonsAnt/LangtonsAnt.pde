@@ -43,7 +43,6 @@ void turnRight() {
   else { dir += 1; }
 }
 
-
 void draw() {
   background(255);
   ant.loadPixels();
